@@ -1,22 +1,31 @@
 ---
-name: writing-plans
-description: Use when you have a spec or requirements for a multi-step task, before touching code
+name: creating-tickets
+description: Use when you have a spec or requirements for a multi-step task and you need to create ticket(s) for it, before touching code
 ---
 
-# Writing Plans
+# Creating tickets
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Create comprehensive implementation tickets assuming the engineer has zero context for our codebase and questionable taste.
+
+Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
+
+The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `/setup-skills`.
+
+Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
-**Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
+**Announce at start:** "I'm using the create-tickets skill to create the implementation plan."
 
 **Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees` skill at execution time.
 
-**Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
-- (User preferences for plan location override this default)
+**Write plan to a temporary file**
+
+**Self-review plan**
+
+**Publish tickets to:** projects issue tracker `<feature name>` under the spec ticket (if available)
 
 ## Scope Check
 
@@ -42,23 +51,12 @@ deliverable needs them; split only where a reviewer could meaningfully
 reject one task while approving its neighbor. Each task ends with an
 independently testable deliverable.
 
-## Bite-Sized Task Granularity
-
-**Each step is one action (2-5 minutes):**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
-- "Commit" - step
-
-## Plan Document Header
+## Plan Header
 
 **Every plan MUST start with this header:**
 
 ```markdown
 # [Feature Name] Implementation Plan
-
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -66,7 +64,7 @@ independently testable deliverable.
 
 **Tech Stack:** [Key technologies/libraries]
 
-**Spec:** [path to the spec/design doc this plan implements — the plan
+**Spec:** [path to the spec/design ticket this plan implements — the plan
 argues from the spec, so the spec travels with it; executors read both]
 
 ## Global Constraints
@@ -79,10 +77,16 @@ include this section.]
 ---
 ```
 
-## Task Structure
+## Ticket Structure
 
 ````markdown
-### Task N: [Component Name]
+### Ticket N: [Component Name]
+
+**Parent:**
+A reference to the parent issue on the tracker.
+
+**Blocked by**
+- A reference to each blocking ticket, or "None (can start immediately)".
 
 **Files:**
 - Create: `exact/path/to/file.py`
@@ -95,47 +99,22 @@ include this section.]
   and return types. A task's implementer sees only their own task; this
   block is how they learn the names and types neighboring tasks use.]
 
-- [ ] **Step 1: Write the failing test**
+**What to build**
+The end-to-end behaviour this ticket makes work, from the user's perspective, not layer-by-layer implementation.
 
-```python
-def test_specific_behavior():
-    result = function(input)
-    assert result == expected
-```
+**Acceptance criteria**
+- [ ] Criterion 1
+- [ ] Criterion 2
 
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: FAIL with "function not defined"
-
-- [ ] **Step 3: Write minimal implementation**
-
-```python
-def function(input):
-    return expected
-```
-
-- [ ] **Step 4: Run test to verify it passes**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: PASS
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add tests/path/test.py src/path/file.py
-git commit -m "feat: add specific feature"
-```
 ````
 
 ## No Placeholders
 
-Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
+Every task must contain the actual content an engineer needs. These are **plan failures** — never write them:
 - "TBD", "TODO", "implement later", "fill in details"
 - "Add appropriate error handling" / "add validation" / "handle edge cases"
 - "Write tests for the above" (without actual test code)
 - "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
-- Steps that describe what to do without showing how (code blocks required for code steps)
 - References to types, functions, or methods not defined in any task
 
 ## Self-Review
@@ -150,22 +129,25 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 
-## Execution Handoff
+## Plan Handoff
 
-After saving the plan, offer execution choice:
+After reviewing the plan:
 
-**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
+- Create each ticket in the issue tracker under spec parent:
+    ````
+    # TICKET CONTENT
+    [content of the TICKET N]
 
-**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
+    # PLAN HEADER
+    [plan header from the complete plan travels with each ticket.]
 
-**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
+    ````
 
-**Which approach?"**
+- Apply `ready-for-agent` label to tickets
 
-**If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:subagent-driven-development
-- Fresh subagent per task + two-stage review
+- Make sure tickets are correctly ordered on issue tracker
 
-**If Inline Execution chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:executing-plans
-- Batch execution with checkpoints for review
+- Make sure parent & blockers are correctly declared on issue tracker-
+
+**"Plan complete and tickets are published to issue tracker: N) `<ticket-id>-<task-name>`."**
+  - (print list each ticket)
