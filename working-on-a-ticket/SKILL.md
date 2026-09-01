@@ -1,6 +1,6 @@
 ---
 name: working-on-a-ticket
-description: "You MUST use this before working on a ticket"
+description: You MUST use this before working on a ticket
 ---
 
 # Working on a ticket
