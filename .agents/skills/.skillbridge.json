@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "links": {
+    "api-and-interface-design": "/Users/osman/Code/SkillShop/ozskills.experimental/api-and-interface-design",
+    "brainstorming": "/Users/osman/Code/SkillShop/ozskills.experimental/brainstorming",
+    "code-simplification": "/Users/osman/Code/SkillShop/ozskills.experimental/code-simplification",
+    "committing-code": "/Users/osman/Code/SkillShop/ozskills.experimental/committing-code",
+    "crafting-an-experience": "/Users/osman/Code/SkillShop/ozskills.experimental/crafting-an-experience",
+    "creating-tickets": "/Users/osman/Code/SkillShop/ozskills.experimental/creating-tickets",
+    "observability-and-instrumentation": "/Users/osman/Code/SkillShop/ozskills.experimental/observability-and-intrumentation",
+    "setup-skills": "/Users/osman/Code/SkillShop/ozskills.experimental/setup-skills",
+    "working-on-a-ticket": "/Users/osman/Code/SkillShop/ozskills.experimental/working-on-a-ticket",
+    "writing-for-agents": "/Users/osman/Code/SkillShop/ozskills/skills/productivity/writing-for-agents"
+  }
+}

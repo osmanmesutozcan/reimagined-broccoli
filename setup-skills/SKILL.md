@@ -1,6 +1,6 @@
 ---
 name: setup-skills
-description: "Configure a repository for the standard skills baseline: AGENTS.md rules, Backlog.md, canonical triage labels, domain docs, and tool-readiness checks. Run once before first use of the other skills."
+description: "Configure a repository for the standard skills baseline: AGENTS.md rules, Backlog.md, canonical triage labels, domain docs, a default dprint config, and tool-readiness checks. Run once before first use of the other skills."
 disable-model-invocation: true
 ---
 
@@ -16,6 +16,7 @@ Do not ask the user to choose these:
 - Backlog.md is the issue tracker. Use the `backlog` CLI for all tracker operations.
 - Triage uses the canonical labels in [triage-labels.md](./triage-labels.md).
 - Domain docs use single-context layout unless existing files or clear monorepo evidence establish multiple contexts.
+- Create root `dprint.json` from [dprint.json](./dprint.json) only when no existing dprint configuration is found. Preserve existing configurations and their plugin versions.
 - Missing tools are reported, never installed or upgraded by this skill.
 
 ## 1. Explore
@@ -45,6 +46,14 @@ Use an existing layout when one is already established:
 - Root `CONTEXT.md` without a map means single-context.
 
 Otherwise, select multi-context only when the repository has clear monorepo evidence, such as workspace configuration plus multiple packages with their own source trees. Ambiguous repositories are single-context. Record the selection, but do not create empty `CONTEXT.md`, `CONTEXT-MAP.md`, or ADR files; the domain-modeling skill creates them when there is real content.
+
+### dprint configuration
+
+- Look for `dprint.json`, `dprint.jsonc`, `.dprint.json`, and `.dprint.jsonc`, including workspace/package configs. Inspect scripts and CI for custom paths or URLs passed through `--config` or `-c`, and check for an inherited parent config.
+- If any existing dprint configuration is found, record its location and leave it untouched. Do not create a competing root config, even if the existing config is invalid; report that as a readiness gap.
+- Otherwise, plan to create root `dprint.json` from [dprint.json](./dprint.json). Preserve its formatting options and excludes.
+- For a new config only, check the official registry at `https://plugins.dprint.dev/info.json` for the latest published versions of the same seven plugins. Use the registry's version-pinned URLs in the proposal; do not add plugins or use unversioned URLs. If the registry is unavailable, use the bundled versions and disclose that freshness could not be verified.
+- Version lookup is read-only. Do not run `dprint init` or `dprint config update`, and do not upgrade the installed executable.
 
 ### Tool readiness
 
@@ -116,6 +125,12 @@ Show the exact proposed contents of:
 
 If these files already exist, show the exact merge. Preserve relevant repository-specific additions and surface conflicts instead of silently overwriting them.
 
+### dprint config
+
+If no existing configuration was found, show the exact proposed root `dprint.json` contents, including any plugin version updates from the bundled template. Include its creation in the grouped approval even when the `dprint` executable is missing.
+
+Otherwise, report the existing configuration location and explicitly state that it will be preserved without plugin updates.
+
 ### Planned action and readiness gaps
 
 - Show `backlog init --defaults --agent-instructions none` when initialization is needed and the executable is available.
@@ -134,8 +149,9 @@ After approval:
 1. If planned, run `backlog init --defaults --agent-instructions none`. Stop and report the command output if initialization fails.
 2. Create `docs/agents/` when needed and write the approved tracker, triage, and domain docs.
 3. Create or merge root `AGENTS.md` exactly as approved. Keep `## Rules` first and preserve unrelated instructions.
-4. Do not edit `CLAUDE.md`.
-5. Do not install missing tools.
+4. If approved, create root `dprint.json` with the exact proposed contents. Recheck for an existing configuration first; if one appeared since exploration, stop this action and report the conflict instead of overwriting it or creating a competing config.
+5. Do not edit `CLAUDE.md`.
+6. Do not install missing tools.
 
 When setup-owned headings already exist, update them in place. Never append duplicate `## Rules`, `## Agent skills`, or `docs/agents/` content merely because the wording differs.
 
@@ -149,6 +165,8 @@ Setup is complete only after checking all applicable conditions:
 - No unresolved template placeholders remain.
 - When `backlog` is available, `backlog instructions overview` confirms initialization.
 - The recorded domain layout matches the detected repository shape.
+- When a new `dprint.json` was approved, it exists, parses as JSON, and matches the approved options and version-pinned plugin URLs. If `dprint` is available, run `dprint output-resolved-config --config dprint.json` to validate plugin configuration without reformatting the repository; report any errors rather than silently changing the approved config.
+- Existing dprint configurations and plugin versions remain unchanged; reruns do not create a competing config.
 - Existing unrelated instructions and files remain intact.
 
 Report:
@@ -156,6 +174,7 @@ Report:
 - Files created and updated
 - Whether Backlog.md was initialized or already present
 - The selected domain layout
+- Whether `dprint.json` was created or an existing configuration was preserved, and whether plugin freshness was verified
 - Shopify-specific rules added, if any
 - Missing tools or scripts the user still needs to handle
 
